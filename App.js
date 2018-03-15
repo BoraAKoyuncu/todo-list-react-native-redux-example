@@ -142,11 +142,7 @@ const todoApp = combineReducers({
     todos
 });
 
-let store = createStore(todoApp, sampleState) // TODO(gazihan) try giving in sampleState
-
-
-
-
+let store = createStore(todoApp, sampleState);
 
 
 
@@ -157,7 +153,7 @@ class AddTodo extends Component {
     }
 
     buttonWasClicked = () => {
-        this.props.onAddClicked(this.state.text);
+        this.props.dispatch({ type: ADD_TODO, text: this.state.text });
     }
 
     render() {
@@ -171,6 +167,9 @@ class AddTodo extends Component {
         );
     }
 }
+
+AddTodo = connect()(AddTodo);
+
 
 class Todo extends Component {
 
@@ -211,9 +210,9 @@ class Footer extends Component {
     render() {
         return (
             <View style={{backgroundColor: '#aa4978', height: 60, flexDirection: 'row', padding: 10}}>
-                <Link onClick={() => {Alert.alert("all was clicked")}} active={true}>All</Link>
-                <Link onClick={() => {Alert.alert("complete was clicked")}} active={false}>Complete</Link>
-                <Link onClick={() => {Alert.alert("incomplete was clicked")}} active={false}>Incomplete</Link>
+                <FilterLink filter={SHOW_ALL}>All</FilterLink>
+                <FilterLink filter={SHOW_COMPLETED}>Complete</FilterLink>
+                <FilterLink filter={SHOW_ACTIVE}>Active</FilterLink>
             </View>
         )
     }
@@ -253,23 +252,23 @@ const VisibleTodoList = connect(
 )(TodoList);
 
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps_FilterLink = (state, ownProps) => {
     return {
         active: ownProps.filter === state.visibilityFilter
     }
 }
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps_FilterLink = (dispatch, ownProps) => {
     return {
         onClick: () => {
-            dispatch(setVisibilityFilter(ownProps.filter)) // TODO create the action here and make sure onclick is in the function
+            dispatch({ type: SET_VISIBILITY_FILTER, filter: ownProps.filter })
         }
     }
 };
 
 const FilterLink = connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToProps_FilterLink,
+    mapDispatchToProps_FilterLink
 )(Link);
 
 
@@ -282,7 +281,7 @@ export default class App extends Component {
         return (
             <Provider store={store}>
                 <View style={{flex: 1}}>
-                    <AddTodo onAddClicked={(text)=>{Alert.alert(text);}}/>
+                    <AddTodo/>
                     <VisibleTodoList/>
                     <Footer/>
                 </View>
